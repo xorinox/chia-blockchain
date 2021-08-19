@@ -24,7 +24,7 @@ async def show(root_path: Path):
 
     keychain = Keychain()
     all_sks = keychain.get_all_private_keys()
-    if not al_sks:
+    if not all_sks:
         print("There are no saved private keys")
         sys.exit(1)
 
