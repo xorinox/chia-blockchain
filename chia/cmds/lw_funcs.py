@@ -22,14 +22,17 @@ async def show(root_path: Path):
     db_path_replaced: str = config["database_path"].replace("CHALLENGE", config["selected_network"])
     db_path = path_from_root(root_path, db_path_replaced)
 
+    keychain = Keychain()
+    all_sks = keychain.get_all_private_keys()
+    if not al_sks:
+        print("There are no saved private keys")
+        sys.exit(1)
+
     connection = await aiosqlite.connect(db_path)
     db_wrapper = DBWrapper(connection)
     coin_store = await CoinStore.create(db_wrapper)
 
-    keychain = Keychain()
-    all_sks = keychain.get_all_private_keys()
     ph_pool_pk = {}
-
     for sk, _ in all_sks:
         pool_pk = str(master_sk_to_pool_sk(sk).get_g1());
         puzzle_hashes = []
@@ -42,7 +45,6 @@ async def show(root_path: Path):
     await connection.close()
 
     summary = {}
-
     for coin in coins:
         key = ph_pool_pk[coin.coin.puzzle_hash.hex()]
         balance = 0
